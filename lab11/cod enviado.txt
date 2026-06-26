@@ -1,0 +1,452 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Vertice
+{
+    int valor;
+    struct Vertice *esq;
+    struct Vertice *dir;
+    struct Vertice *pai;
+} Vertice;
+
+typedef struct Arvore
+{
+    Vertice *raiz;
+    int qtde;
+} Arvore;
+// void RotacaoEsquerda(Arvore *arvore, Vertice *x)
+// {
+//     // implementar
+
+//     // Anotação quadro Augusto
+//     // // Vertice *aux
+//     // aux = x->pai; ????
+//     // x->dir->pai = x->pai;
+//     // x->pai = x->dir;
+//     // x->dir->esq = x;
+//     // x->dir = x->dir->esq;
+
+//     // É o oposto de rigth-rotate
+//     // Auxiliar para não perder o valor
+//     Vertice *y = x->dir;
+//     x->dir = y->esq;
+//     // y->esq se for nulo, não precisa fazer nada
+//     if (y->esq != NULL)
+//     {
+//         y->esq->pai = x;
+//     }
+//     // O pai do filho direito de x (y) passa a ser filho do pai de x.
+//     y->pai = x->pai;
+//     // Se x não tem pai (raiz), então y é a nova raiz
+//     if (x->pai == NULL)
+//     {
+//         arvore->raiz = y;
+//     }
+//     // Se x é filho esquerdo, então y é o novo filho esquerdo
+//     else if (x == x->pai->esq)
+//     {
+//         x->pai->esq = y;
+//     }
+//     // Se for filho direito, então y é o novo filho direito
+//     else
+//     {
+//         x->pai->dir = y;
+//     }
+//     // O filho esquerdo de y passa a ser x
+//     y->esq = x;
+//     // O pai de x passa a ser y
+//     x->pai = y;
+// }
+
+// void RotacaoDireita(Arvore *arvore, Vertice *x)
+// {
+
+//     // Anotação quadro Augusto
+//     // // Vertice *aux = x->pai;
+//     // x->esq->pai = x->pai;
+//     // x->pai = x->esq;
+//     // x->esq->dir = x;
+//     // x->esq = x->esq->dir;
+
+//     Vertice *y = x->esq;
+//     x->esq = y->dir;
+//     // y->esq se for nulo, não precisa fazer nada
+//     if (y->dir != NULL)
+//     {
+//         y->dir->pai = x;
+//     }
+//     // O pai do filho direito de x (y) passa a ser filho do pai de x.
+//     y->pai = x->pai;
+//     // Se x não tem pai (raiz), então y é a nova raiz
+//     if (x->pai == NULL)
+//     {
+//         arvore->raiz = y;
+//     }
+//     // Se x é filho direito, então y é o novo filho direito
+//     else if (x == x->pai->dir)
+//     {
+//         x->pai->dir = y;
+//     }
+//     // Se for filho esquerdo, então y é o novo filho esquerdo
+//     else
+//     {
+//         x->pai->esq = y;
+//     }
+
+//     y->dir = x;
+//     x->pai = y;
+// }
+
+void RotacaoEsquerda(Arvore *arvore, Vertice *x)
+{
+    //verifica se as coisas existem
+    Vertice *y = x->dir;
+    x->dir = y->esq;
+    //   Vertice *beta = y->esq;
+
+    y->pai = x->pai; //y aponta pro pai
+
+    //seta verde
+    //ver que lado x ta do pai (se x é filho esq ou filho dir)
+    if (x->pai == NULL)
+    {
+        arvore->raiz = y; //conferir
+    }
+    else if (x == x->pai->esq)
+    {
+        x->pai->esq = y;
+    }
+    else if (x == x->pai->dir)
+    {
+        x->pai->dir = y;
+    }
+
+    //seta azul
+    if (y->esq != NULL)
+    { //filho esquerdo de y existe
+        y->esq->pai = x;
+    }
+
+    //seta vermelha
+    y->esq = x;
+    x->pai = y;
+
+    //pai do y é pai do x se ele existe
+
+    //  //apontamentos de pai do filho direito de x
+    //  x->pai->dir = x->dir; //filho direito de x é filho do pai de x
+    //  x->dir->pai = x->pai; //pai do x passa a ser pai do filho direito de x
+
+    // //apontamentos  de pai de x
+    //  x->pai = x->dir; //pai de x passa a ser o filho direito de x
+    //  x->dir->esq = x;
+
+    //  //apontamentos de filho direito de x
+    //  x->dir = x->dir->esq; //filho esquerdo do filho direito x passa a ser o filho esquerdo de x
+    //  x->dir->esq->pai = x->dir; //pai do filho esquerdo de x passa a ser x
+}
+
+void RotacaoDireita(Arvore *arvore, Vertice *x)
+{
+
+    //verifica se as coisas existem
+    Vertice *y = x->esq;
+    x->esq = y->dir;
+    //   Vertice *beta = y->dir;
+
+    y->pai = x->pai; //y aponta pro pai
+
+    //seta verde
+    //ver que lado x ta do pai (se x é filho dir ou filho dirUE)
+    if (x->pai == NULL)
+    {
+        arvore->raiz = y; //conferir
+    }
+    else if (x == x->pai->dir)
+    {
+        x->pai->dir = y;
+    }
+    else if (x == x->pai->esq)
+    {
+        x->pai->esq = y;
+    }
+
+    //seta azul
+    if (y->dir != NULL)
+    { //filho esqrdo de y existe
+        y->dir->pai = x;
+    }
+
+    //seta vermelha
+    y->dir = x;
+    x->pai = y;
+}
+
+int MAX(int x, int y)
+{
+    if (x >= y)
+        return x;
+    else
+        return y;
+}
+
+int altura(Vertice *x)
+{
+    if (x == NULL)
+    {
+        return -1;
+    }
+    return MAX(altura(x->esq), altura(x->dir)) + 1;
+}
+
+int fatorBalanceamento(Vertice *x) { return altura(x->dir) - altura(x->esq); }
+
+void balanceie(Arvore *arvore, Vertice *x)
+{
+    Vertice *temp_esq = x->esq;
+    Vertice *temp_dir = x->dir;
+    int R = fatorBalanceamento(x); //fator do vertice r
+                                   //   int E = fatorBalanceamento(x->esq); //fator do filho esquerdo de r
+                                   //   int D = fatorBalanceamento(x->dir); //fator do filho direito de r
+    if (R < -1 || R > 1)
+    {
+        if (R >= 2 && fatorBalanceamento(temp_dir) >= 0)
+        { //caso 1
+            RotacaoEsquerda(arvore, x);
+            printf("Esquerda em %d \n", x->valor);
+        }
+        else if (R >= 2 && fatorBalanceamento(temp_dir) < 0)
+        {                                     //caso 2
+            RotacaoDireita(arvore, temp_dir); //rotate d
+            printf("Direita em %d \n", temp_dir->valor);
+            RotacaoEsquerda(arvore, x); //rotate R
+            printf("Esquerda em %d \n", x->valor);
+        }
+        else if (R <= -2 && fatorBalanceamento(temp_esq) <= 0)
+        {                              //caso 3
+            RotacaoDireita(arvore, x); //rotate R
+            printf("Direita em %d \n", x->valor);
+        }
+        else if (R <= -2 && fatorBalanceamento(temp_esq) > 0)
+        {                                      //caso 4
+            RotacaoEsquerda(arvore, temp_esq); //rotate E
+            printf("Esquerda em %d \n", temp_esq->valor);
+            RotacaoDireita(arvore, x); //rotate R
+            printf("Direita em %d \n", x->valor);
+        }
+    }
+}
+
+int insere(Arvore *arvore, int valor)
+{
+    Vertice *novo = malloc(sizeof(Vertice));
+    novo->dir = NULL;
+    novo->esq = NULL;
+    novo->pai = NULL;
+    novo->valor = valor;
+
+    Vertice *anterior = NULL;
+    Vertice *atual = arvore->raiz;
+
+    while (atual != NULL)
+    {
+        anterior = atual;
+        if (valor <= atual->valor)
+        {
+            atual = atual->esq;
+        }
+        else
+        {
+            atual = atual->dir;
+        }
+    }
+
+    novo->pai = anterior;
+    if (anterior != NULL)
+    {
+        if (valor <= anterior->valor)
+        {
+            anterior->esq = novo;
+        }
+        else
+        {
+            anterior->dir = novo;
+        }
+    }
+    else
+    {
+        arvore->raiz = novo;
+    }
+    arvore->qtde++;
+
+    Vertice *temp = novo->pai;
+    while (temp != NULL)
+    {
+        balanceie(arvore, temp);
+        temp = temp->pai;
+    }
+    return 1;
+}
+
+int remover(Arvore *arvore, Vertice *x)
+{
+    int filhos = 0;
+
+    if (x != NULL && x->esq != NULL)
+    {
+        filhos++;
+    }
+    if (x != NULL && x->dir != NULL)
+    {
+        filhos++;
+    }
+
+    Vertice *pai = x->pai;
+    if (filhos == 0)
+    {
+        if (pai != NULL)
+        {
+            if (pai->esq == x)
+            {
+                pai->esq = NULL;
+            }
+            else
+            {
+                pai->dir = NULL;
+            }
+        }
+        else
+        {
+            arvore->raiz = NULL;
+        }
+        arvore->qtde--;
+    }
+    else if (filhos == 1)
+    {
+        Vertice *filho = x->esq;
+        if (filho == NULL)
+            filho = x->dir;
+
+        if (pai == NULL)
+            arvore->raiz = filho;
+        else
+        {
+            if (pai->esq == x)
+                pai->esq = filho;
+            else
+                pai->dir = filho;
+        }
+        filho->pai = pai;
+        arvore->qtde--;
+    }
+    else
+    {
+        Vertice *sucessor = x;
+        sucessor = sucessor->dir;
+        while (sucessor->esq != NULL)
+            sucessor = sucessor->esq;
+        x->valor = sucessor->valor;
+        return remover(arvore, sucessor);
+    }
+
+    Vertice *temp = pai;
+    while (temp != NULL)
+    {
+        balanceie(arvore, temp);
+        temp = temp->pai;
+    }
+    return 1;
+}
+
+int buscar_e_remover(Arvore *arvore, int valor)
+{
+    Vertice *atual = arvore->raiz;
+    while (atual != NULL)
+    {
+        if (valor < atual->valor)
+            atual = atual->esq;
+        else if (valor > atual->valor)
+            atual = atual->dir;
+        else
+            return remover(arvore, atual);
+    }
+    return 0;
+}
+
+int getValor(Arvore *arvore) { return arvore->qtde; }
+
+void imprimeInOrdem(Vertice *raiz)
+{
+    if (raiz != NULL)
+    {
+        imprimeInOrdem(raiz->esq);
+        printf("%d ", raiz->valor);
+        imprimeInOrdem(raiz->dir);
+    }
+}
+
+void imprimePosOrdem(Vertice *raiz)
+{
+    if (raiz != NULL)
+    {
+        imprimePosOrdem(raiz->esq);
+        imprimePosOrdem(raiz->dir);
+        printf("%d ", raiz->valor);
+    }
+}
+
+void testeInsere(Arvore *arvore, int valor)
+{
+    if (insere(arvore, valor))
+    {
+        printf("valor %d inserido na arvore", valor);
+        printf("\nIn-Ordem: ");
+        imprimeInOrdem(arvore->raiz);
+        printf("\nPos-Ordem: ");
+        imprimePosOrdem(arvore->raiz);
+        printf("\n======== Total: %d nos ===========\n", getValor(arvore));
+    }
+}
+
+void testeRemove(Arvore *arvore, int valor)
+{
+    if (buscar_e_remover(arvore, valor))
+    {
+        printf("valor %d removido na arvore", valor);
+        printf("\nIn-Ordem: ");
+        imprimeInOrdem(arvore->raiz);
+        printf("\nPos-Ordem: ");
+        imprimePosOrdem(arvore->raiz);
+        printf("\n======== Total: %d nos ===========\n", getValor(arvore));
+    }
+    else
+    {
+        printf("valor %d NAO removido na arvore\n", valor);
+    }
+}
+
+int main(void)
+{
+    Arvore *arvore = malloc(sizeof(Arvore));
+    arvore->raiz = NULL;
+    arvore->qtde = 0;
+
+    testeInsere(arvore, 54);
+    testeInsere(arvore, 48);
+    testeInsere(arvore, 62);
+    testeInsere(arvore, 56);
+    testeInsere(arvore, 55);
+    testeInsere(arvore, 58);
+    testeInsere(arvore, 59);
+    testeRemove(arvore, 48);
+    testeRemove(arvore, 55);
+    testeRemove(arvore, 58);
+    testeRemove(arvore, 62);
+    testeRemove(arvore, 50);
+    testeRemove(arvore, 60);
+    testeRemove(arvore, 54);
+    testeRemove(arvore, 59);
+    testeRemove(arvore, 56);
+
+    return 0;
+}
